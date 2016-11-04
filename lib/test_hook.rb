@@ -17,32 +17,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
     @examples = to_examples test[:examples]
     @subject = test[:subject]
 
-    if @subject
-<<EOF
-JMP main
-
-#{request.extra}
-#{request.content}
-
-main:
-#{subject_call}
-#{input_file_separator}
-#{initial_state_file}
-EOF
-    else
-<<EOF
-JMP main
-
-#{request.extra}
-
-main:
-#{skip_command}
-#{request.content}
-#{input_file_separator}
-#{initial_state_file}
-EOF
-    end
-
+    Qsim::Subject.from_test(test, request).compile_code(input_file_separator, initial_state_file)
   end
 
   def execute!(request)
@@ -115,19 +90,11 @@ EOF
     JSON.generate initial_states
   end
 
-  def input_file_separator
-    '!!!BEGIN_EXAMPLES!!!'
-  end
-
   def q_architecture
     6
   end
 
-  def skip_command
-    'MOV R0, R0'
-  end
-
-  def subject_call
-    "CALL #{@subject}"
+  def input_file_separator
+    '!!!BEGIN_EXAMPLES!!!'
   end
 end
