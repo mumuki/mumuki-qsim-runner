@@ -13,9 +13,24 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def compile_file_content(request)
-    @examples = to_examples(parse_test(request)[:examples])
+    test = parse_test request
+    @examples = to_examples test[:examples]
+    @subject = test[:subject]
 
-    <<EOF
+    if @subject
+<<EOF
+JMP main
+
+#{request.extra}
+#{request.content}
+
+main:
+#{subject_call}
+#{input_file_separator}
+#{initial_state_file}
+EOF
+    else
+<<EOF
 JMP main
 
 #{request.extra}
@@ -26,6 +41,8 @@ main:
 #{input_file_separator}
 #{initial_state_file}
 EOF
+    end
+
   end
 
   def execute!(request)
@@ -108,5 +125,9 @@ EOF
 
   def skip_command
     'MOV R0, R0'
+  end
+
+  def subject_call
+    "CALL #{@subject}"
   end
 end

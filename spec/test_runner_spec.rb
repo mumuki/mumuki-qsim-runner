@@ -77,6 +77,48 @@ EOF
       }
       it { expect(runner.examples).to eq [expected_example] }
     end
+
+    context 'compiled code with subject' do
+      let(:content) {
+<<EOF
+quadruplicateR1:
+CALL duplicateR1
+CALL duplicateR1
+RET
+EOF
+      }
+
+      let(:test) {
+%q{
+subject: 'quadruplicateR1'
+examples:
+- name: 'R1 final value is quadruple of original'
+  preconditions:
+    records:
+      R1: '0002'
+  postconditions:
+    equal:
+      R1: '0008'}}
+
+      let(:expected_compiled_code) {
+        <<EOF
+JMP main
+
+duplicateR1:
+MUL R1, 0x0002
+RET
+quadruplicateR1:
+CALL duplicateR1
+CALL duplicateR1
+RET
+
+main:
+CALL quadruplicateR1
+EOF
+      }
+
+      it { expect(result).to include expected_compiled_code }
+    end
   end
 
   describe '#execute!' do
@@ -97,7 +139,8 @@ EOF
 
   describe '#run!' do
     let(:file) { runner.compile(req content, extra, test.to_yaml) }
-    let(:test) { {examples: examples} }
+    let(:test) { {subject: subject, examples: examples} }
+    let(:subject) { nil }
     let(:examples) { [{}] }
     let(:result) { runner.run!(file) }
     let(:extra) { '' }
@@ -160,6 +203,7 @@ RET}}
     end
 
     context 'with routine definition' do
+      let(:subject) { 'timesTwo' }
       let(:examples) {
         [{
              name: 'Times two stores the result in R1',

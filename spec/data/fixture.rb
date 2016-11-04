@@ -23,6 +23,7 @@ CALL timesTwo
 %q{
 timesTwo:
 MUL R1, 0x0002
+RET
 }
   end
 
