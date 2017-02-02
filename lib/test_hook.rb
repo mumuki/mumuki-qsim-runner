@@ -41,7 +41,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   private
 
   def to_examples(examples)
-    defaults = { preconditions: {} }
+    defaults = {preconditions: {}}
     examples.each_with_index.map { |example, index| defaults.merge(example).merge(id: index) }
   end
 
@@ -60,33 +60,37 @@ class QsimTestHook < Mumukit::Templates::FileHook
 
   def default_initial_state
     {
-      special_records: {
-        PC: '0000',
-        SP: 'FFEF',
-        IR: '0000'
-      },
-      flags: {
-        N: 0,
-        Z: 0,
-        V: 0,
-        C: 0
-      },
-      records: {
-        R0: '0000',
-        R1: '0000',
-        R2: '0000',
-        R3: '0000',
-        R4: '0000',
-        R5: '0000',
-        R6: '0000',
-        R7: '0000'
-      },
-      memory: {}
+        special_records: {
+            PC: '0000',
+            SP: 'FFEF',
+            IR: '0000'
+        },
+        flags: {
+            N: 0,
+            Z: 0,
+            V: 0,
+            C: 0
+        },
+        records: {
+            R0: '0000',
+            R1: '0000',
+            R2: '0000',
+            R3: '0000',
+            R4: '0000',
+            R5: '0000',
+            R6: '0000',
+            R7: '0000'
+        },
+        memory: {}
     }
   end
 
   def initial_state_file
-    initial_states = @examples.map { |example| default_initial_state.merge(id: example[:id]).deep_merge(example[:preconditions]) }
+    initial_states = @examples.map do |example|
+      default_initial_state
+          .merge(id: example[:id])
+          .deep_merge(example[:preconditions])
+    end
     JSON.generate initial_states
   end
 

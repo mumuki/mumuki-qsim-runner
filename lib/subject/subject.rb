@@ -12,16 +12,16 @@ module Qsim
     end
 
     def compile_code(input_file_separator, initial_state_file)
-<<EOF
-JMP main
+      <<~QSIM
+        JMP main
 
-#{extra_code}
+        #{extra_code}
 
-main:
-#{main_code}
-#{input_file_separator}
-#{initial_state_file}
-EOF
+        main:
+        #{main_code}
+        #{input_file_separator}
+        #{initial_state_file}
+      QSIM
     end
   end
 end

@@ -12,54 +12,58 @@ describe 'running' do
 
   describe '#compile_file_content' do
     let(:content) {
-<<EOF
-MOV R1, 0x0004
-CALL duplicateR1
-EOF
+      <<~QSIM
+        MOV R1, 0x0004
+        CALL duplicateR1
+      QSIM
     }
 
     let(:extra) {
-<<EOF
-duplicateR1:
-MUL R1, 0x0002
-RET
-EOF
+      <<~QSIM
+        duplicateR1:
+        MUL R1, 0x0002
+        RET
+      QSIM
     }
 
     let(:test) {
-%q{
-examples:
-- name: 'R2 stores the sum of R0 and R1'
-  preconditions:
-    records:
-      R0: 'B5E1'
-      R1: '000F'
-  postconditions:
-    equal:
-      R2: 'B5F0'}}
+      <<~EXAMPLE
+        examples:
+        - name: 'R2 stores the sum of R0 and R1'
+          preconditions:
+            records:
+              R0: 'B5E1'
+              R1: '000F'
+          postconditions:
+            equal:
+              R2: 'B5F0'
+      EXAMPLE
+    }
 
     let(:request) { req content, extra, test }
     let!(:result) { runner.compile_file_content request }
 
     context 'compiles the code and the preconditions' do
       let(:expected_compiled_code) {
-        <<EOF
-JMP main
+        <<~QSIM
+          JMP main
 
-duplicateR1:
-MUL R1, 0x0002
-RET
+          duplicateR1:
+          MUL R1, 0x0002
+          RET
 
-main:
-MOV R0, R0
-MOV R1, 0x0004
-CALL duplicateR1
-!!!BEGIN_EXAMPLES!!!
-[{"special_records":{"PC":"0000","SP":"FFEF","IR":"0000"},"flags":{"N":0,"Z":0,"V":0,"C":0},"records":{"R0":"B5E1","R1":"000F","R2":"0000","R3":"0000","R4":"0000","R5":"0000","R6":"0000","R7":"0000"},"memory":{},"id":0}]
-EOF
+          main:
+          MOV R0, R0
+          MOV R1, 0x0004
+          CALL duplicateR1
+          !!!BEGIN_EXAMPLES!!!
+          [{"special_records":{"PC":"0000","SP":"FFEF","IR":"0000"},"flags":{"N":0,"Z":0,"V":0,"C":0},"records":{"R0":"B5E1","R1":"000F","R2":"0000","R3":"0000","R4":"0000","R5":"0000","R6":"0000","R7":"0000"},"memory":{},"id":0}]
+        QSIM
       }
 
-      it { expect(result).to eq expected_compiled_code }
+      it 'a' do
+        expect(result).to eq expected_compiled_code
+      end
     end
 
     context 'parses the examples' do
@@ -80,41 +84,43 @@ EOF
 
     context 'compiled code with subject' do
       let(:content) {
-<<EOF
-quadruplicateR1:
-CALL duplicateR1
-CALL duplicateR1
-RET
-EOF
+        <<~QSIM
+          quadruplicateR1:
+          CALL duplicateR1
+          CALL duplicateR1
+          RET
+        QSIM
       }
 
       let(:test) {
-%q{
-subject: 'quadruplicateR1'
-examples:
-- name: 'R1 final value is quadruple of original'
-  preconditions:
-    records:
-      R1: '0002'
-  postconditions:
-    equal:
-      R1: '0008'}}
+        <<~EXAMPLE
+          subject: 'quadruplicateR1'
+          examples:
+          - name: 'R1 final value is quadruple of original'
+            preconditions:
+              records:
+                R1: '0002'
+            postconditions:
+              equal:
+                R1: '0008'
+        EXAMPLE
+      }
 
       let(:expected_compiled_code) {
-        <<EOF
-JMP main
+        <<~QSIM
+          JMP main
 
-duplicateR1:
-MUL R1, 0x0002
-RET
-quadruplicateR1:
-CALL duplicateR1
-CALL duplicateR1
-RET
+          duplicateR1:
+          MUL R1, 0x0002
+          RET
+          quadruplicateR1:
+          CALL duplicateR1
+          CALL duplicateR1
+          RET
 
-main:
-CALL quadruplicateR1
-EOF
+          main:
+          CALL quadruplicateR1
+        QSIM
       }
 
       it { expect(result).to include expected_compiled_code }
@@ -125,14 +131,14 @@ EOF
     let(:request) { req q1_ok_program, '' }
     let(:result) { runner.execute! request }
 
-    let(:expected_result) {{
-        special_records: { PC: '0008', SP: 'FFEF', IR: '28E5 ' },
-        flags: { N: 0, Z: 0, V: 0, C: 0 },
+    let(:expected_result) { {
+        special_records: {PC: '0008', SP: 'FFEF', IR: '28E5 '},
+        flags: {N: 0, Z: 0, V: 0, C: 0},
         records: {
             R0: '0000', R1: '0000', R2: '0000', R3: '0007',
             R4: '0000', R5: '0004', R6: '0000', R7: '0000'
         }
-    }}
+    } }
 
     it { expect(result.first).to include expected_result }
   end
@@ -148,9 +154,9 @@ EOF
     context 'when program finishes' do
       let(:examples) {
         [{
-          name: 'R3 is 0007',
-          operation: :run,
-          postconditions: {equal: {R3: '0007'}}
+             name: 'R3 is 0007',
+             operation: :run,
+             postconditions: {equal: {R3: '0007'}}
          }]
       }
 
@@ -166,7 +172,7 @@ EOF
       let(:examples) {
         [{
              name: 'R1 is 0008',
-             preconditions: { records: {R1: '0005', R2: '0003'} },
+             preconditions: {records: {R1: '0005', R2: '0003'}},
              operation: :run,
              postconditions: {equal: {R1: '0008'}}
          }]
@@ -184,18 +190,19 @@ EOF
       let(:examples) {
         [{
              name: 'R1 is 0008',
-             preconditions: { },
+             preconditions: {},
              operation: :run,
              postconditions: {equal: {R1: '0008'}}
          }]
       }
-
       let(:content) { times_two_usage_program }
       let(:extra) {
-%q{
-timesTwo:
-MUL R1, 0x0002
-RET}}
+        <<~QSIM
+          timesTwo:
+          MUL R1, 0x0002
+          RET
+        QSIM
+      }
       let(:example_result) { result[0][0] }
 
       it { expect(example_result[0]).to eq 'R1 is 0008' }
@@ -224,15 +231,15 @@ RET}}
       let(:examples) {
         [{
              name: 'R1 is 0008',
-             preconditions: { records: {R1: '0005', R2: '0003'} },
+             preconditions: {records: {R1: '0005', R2: '0003'}},
              operation: :run,
              postconditions: {equal: {R1: '0008'}}
          }, {
              name: 'R1 is 0010',
-             preconditions: { records: {R1: '000E', R2: '0001'} },
+             preconditions: {records: {R1: '000E', R2: '0001'}},
              operation: :run,
              postconditions: {equal: {R1: '0010'}}
-        }]
+         }]
       }
 
       let(:content) { sum_r1_r2_program }
@@ -246,7 +253,7 @@ RET}}
       let(:content) { syntax_error_program }
       let(:expected_result) { 'Ha ocurrido un error en la linea 2 : ' }
 
-      it { expect(result[1]).to eq :errored  }
+      it { expect(result[1]).to eq :errored }
       it { expect(result[0]).to eq expected_result }
     end
 
@@ -254,7 +261,7 @@ RET}}
       let(:content) { runtime_error_program }
       let(:expected_result) { 'Una de las etiquetas utilizadas es invalida' }
 
-      it { expect(result[1]).to eq :errored  }
+      it { expect(result[1]).to eq :errored }
       it { expect(result[0]).to eq expected_result }
     end
   end
