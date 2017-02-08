@@ -61,9 +61,7 @@ describe 'running' do
         QSIM
       }
 
-      it 'a' do
-        expect(result).to eq expected_compiled_code
-      end
+      it { expect(result).to eq expected_compiled_code }
     end
 
     context 'parses the examples' do
@@ -98,8 +96,7 @@ describe 'running' do
           examples:
           - name: 'R1 final value is quadruple of original'
             preconditions:
-              records:
-                R1: '0002'
+              R1: '0002'
             postconditions:
               equal:
                 R1: '0008'
