@@ -12,7 +12,7 @@ describe 'Server' do
   after(:all) { Process.kill 'TERM', @pid }
 
   let(:test) {
-    <<~QSIM
+    <<~EXAMPLE
       examples:
       - name: 'Result is OK'
         preconditions:
@@ -30,7 +30,7 @@ describe 'Server' do
           equal:
             R0: '0001'
             R1: '000A'
-    QSIM
+    EXAMPLE
   }
 
   it 'answers a valid hash when submission passes' do
