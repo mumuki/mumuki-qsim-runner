@@ -1,4 +1,3 @@
-require_relative './spec_helper'
 require_relative './data/fixture'
 
 describe 'running' do
@@ -31,9 +30,8 @@ describe 'running' do
         examples:
         - name: 'R2 stores the sum of R0 and R1'
           preconditions:
-            records:
-              R0: 'B5E1'
-              R1: '000F'
+            R0: 'B5E1'
+            R1: '000F'
           postconditions:
             equal:
               R2: 'B5F0'
@@ -169,7 +167,7 @@ describe 'running' do
       let(:examples) {
         [{
              name: 'R1 is 0008',
-             preconditions: {records: {R1: '0005', R2: '0003'}},
+             preconditions: {R1: '0005', R2: '0003'},
              operation: :run,
              postconditions: {equal: {R1: '0008'}}
          }]
@@ -211,7 +209,7 @@ describe 'running' do
       let(:examples) {
         [{
              name: 'Times two stores the result in R1',
-             preconditions: {records: {R1: '0003'}},
+             preconditions: {R1: '0003'},
              operation: :run,
              postconditions: {equal: {R1: '0006'}}
          }]
@@ -228,12 +226,12 @@ describe 'running' do
       let(:examples) {
         [{
              name: 'R1 is 0008',
-             preconditions: {records: {R1: '0005', R2: '0003'}},
+             preconditions: {R1: '0005', R2: '0003'},
              operation: :run,
              postconditions: {equal: {R1: '0008'}}
          }, {
              name: 'R1 is 0010',
-             preconditions: {records: {R1: '000E', R2: '0001'}},
+             preconditions: {R1: '000E', R2: '0001'},
              operation: :run,
              postconditions: {equal: {R1: '0010'}}
          }]

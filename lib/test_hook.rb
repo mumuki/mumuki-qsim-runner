@@ -43,10 +43,9 @@ class QsimTestHook < Mumukit::Templates::FileHook
   private
 
   def to_examples(examples)
-    defaults = {preconditions: {}}
     examples.each_with_index.map do |example, index|
-      example[:preconditions] = classify(example[:preconditions])
-      defaults.merge(example).merge(id: index)
+      example[:preconditions] = classify(example.fetch(:preconditions, {}))
+      example.merge(id: index)
     end
   end
 
@@ -54,10 +53,10 @@ class QsimTestHook < Mumukit::Templates::FileHook
     classified_fields = {}
     fields.map do |key, value|
       field = key.to_s
-      classified_fields.deep_merge!(records: {field: value}) if record?(field)
-      classified_fields.deep_merge!(flags: {field: value}) if flag?(field)
-      classified_fields.deep_merge!(memory: {field: value}) if memory?(field)
-      classified_fields.deep_merge!(special_records: {field: value}) if special_record?(field)
+      classified_fields.deep_merge!(records: {key => value}) if record?(field)
+      classified_fields.deep_merge!(flags: {key => value}) if flag?(field)
+      classified_fields.deep_merge!(memory: {key => value}) if memory?(field)
+      classified_fields.deep_merge!(special_records: {key => value}) if special_record?(field)
     end
     classified_fields
   end

@@ -16,18 +16,16 @@ describe 'Server' do
       examples:
       - name: 'Result is OK'
         preconditions:
-          records:
-            R0: 'B5E1'
-            R1: '000F'
+          R0: 'B5E1'
+          R1: '000F'
         postconditions:
           equal:
             R2: 'B5F0'
 
       - name: 'Records are not modified'
         preconditions:
-          records:
-            R0: '0001'
-            R1: '000A'
+          R0: '0001'
+          R1: '000A'
         postconditions:
           equal:
             R0: '0001'
