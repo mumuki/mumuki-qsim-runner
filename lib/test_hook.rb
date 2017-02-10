@@ -18,12 +18,12 @@ class QsimTestHook < Mumukit::Templates::FileHook
     @subject = test[:subject]
 
     Qsim::Subject
-        .from_test(test, request)
-        .compile_code(input_file_separator, initial_state_file)
+      .from_test(test, request)
+      .compile_code(input_file_separator, initial_state_file)
   end
 
   def execute!(request)
-    result, _ = run_file! compile request
+    result, = run_file! compile request
     parse_json result
   end
 
@@ -53,10 +53,10 @@ class QsimTestHook < Mumukit::Templates::FileHook
     classified_fields = {}
     fields.map do |key, value|
       field = key.to_s
-      classified_fields.deep_merge!(records: {key => value}) if record?(field)
-      classified_fields.deep_merge!(flags: {key => value}) if flag?(field)
-      classified_fields.deep_merge!(memory: {key => value}) if memory?(field)
-      classified_fields.deep_merge!(special_records: {key => value}) if special_record?(field)
+      classified_fields.deep_merge!(records: { key => value }) if record?(field)
+      classified_fields.deep_merge!(flags: { key => value }) if flag?(field)
+      classified_fields.deep_merge!(memory: { key => value }) if memory?(field)
+      classified_fields.deep_merge!(special_records: { key => value }) if special_record?(field)
     end
     classified_fields
   end
@@ -66,7 +66,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def flag?(key)
-    %q(N C V Z).include? key
+    %w(N C V Z).include? key
   end
 
   def memory?(key)
@@ -74,7 +74,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def special_record?(key)
-    %q(SP PC IR).include? key
+    %w(SP PC IR).include? key
   end
 
   def framework
@@ -92,36 +92,36 @@ class QsimTestHook < Mumukit::Templates::FileHook
 
   def default_initial_state
     {
-        special_records: {
-            PC: '0000',
-            SP: 'FFEF',
-            IR: '0000'
-        },
-        flags: {
-            N: 0,
-            Z: 0,
-            V: 0,
-            C: 0
-        },
-        records: {
-            R0: '0000',
-            R1: '0000',
-            R2: '0000',
-            R3: '0000',
-            R4: '0000',
-            R5: '0000',
-            R6: '0000',
-            R7: '0000'
-        },
-        memory: {}
+      special_records: {
+        PC: '0000',
+        SP: 'FFEF',
+        IR: '0000'
+      },
+      flags: {
+        N: 0,
+        Z: 0,
+        V: 0,
+        C: 0
+      },
+      records: {
+        R0: '0000',
+        R1: '0000',
+        R2: '0000',
+        R3: '0000',
+        R4: '0000',
+        R5: '0000',
+        R6: '0000',
+        R7: '0000'
+      },
+      memory: {}
     }
   end
 
   def initial_state_file
     initial_states = @examples.map do |example|
       default_initial_state
-          .merge(id: example[:id])
-          .deep_merge(example[:preconditions])
+        .merge(id: example[:id])
+        .deep_merge(example[:preconditions])
     end
     JSON.generate(initial_states)
   end

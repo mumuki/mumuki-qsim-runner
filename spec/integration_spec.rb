@@ -11,7 +11,7 @@ describe 'Server' do
 
   after(:all) { Process.kill 'TERM', @pid }
 
-  let(:test) {
+  let(:test) do
     <<~EXAMPLE
       examples:
       - name: 'Result is OK'
@@ -31,12 +31,10 @@ describe 'Server' do
             R0: '0001'
             R1: '000A'
     EXAMPLE
-  }
+  end
 
   it 'answers a valid hash when submission passes' do
-    response = bridge.run_tests!(test: test, extra: '', content: %q{
-      ADD R2, R0
-      ADD R2, R1}, expectations: [])
+    response = bridge.run_tests!(test: test, extra: '', content: 'ADD R2, R0\nADD R2, R1', expectations: [])
 
     expect(response[:response_type]).to eq :structured
     expect(response[:test_results].size).to eq 2

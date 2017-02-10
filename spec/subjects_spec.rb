@@ -10,7 +10,7 @@ describe 'Subjects' do
 
       context 'without subject' do
         it 'returns a Program subject' do
-          subject = subject_with_test()
+          subject = subject_with_test
           expect(subject).to be_instance_of Qsim::ProgramSubject
         end
       end
@@ -46,7 +46,7 @@ describe 'Subjects' do
           JMP main
 
           NOP
-          
+
           main:
           MOV R0, R0
           decrement: SUB AAAA, BBBB
