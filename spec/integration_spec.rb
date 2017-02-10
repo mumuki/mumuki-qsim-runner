@@ -34,7 +34,7 @@ describe 'Server' do
   end
 
   it 'answers a valid hash when submission passes' do
-    response = bridge.run_tests!(test: test, extra: '', content: 'ADD R2, R0\nADD R2, R1', expectations: [])
+    response = bridge.run_tests!(test: test, extra: '', content: "ADD R2, R0\nADD R2, R1", expectations: [])
 
     expect(response[:response_type]).to eq :structured
     expect(response[:test_results].size).to eq 2
