@@ -62,7 +62,9 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def record?(key)
-    key.start_with? 'R'
+    (0..7)
+      .map { |number| "R#{number}" }
+      .include?(key)
   end
 
   def flag?(key)
@@ -70,7 +72,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def memory?(key)
-    /^[A-F0-9]/.matches?(key)
+    /^[A-F0-9]{4}/.matches?(key)
   end
 
   def special_record?(key)

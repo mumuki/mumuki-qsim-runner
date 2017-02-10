@@ -20,7 +20,7 @@ describe QsimTestHook do
     end
 
     it 'ignores unmatched preconditions' do
-      tests = [preconditions: { foo: '1', Z: '1' }]
+      tests = [preconditions: { foo: '1', R8: '1', Z: '1' }]
       example = to_examples(tests).first
       expect(example).to eq(id: 0, preconditions: { flags: { Z: '1' } })
     end
