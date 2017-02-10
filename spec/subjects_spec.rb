@@ -1,63 +1,64 @@
-require 'ostruct'
-
 describe 'Subjects' do
   describe Qsim::Subject do
     describe '.from_test' do
-      subject { Qsim::Subject.from_test(definition, 'foo') }
-
       context 'given a subject' do
-        let(:definition) { {subject: 'foo'} }
-        it { is_expected.to be_instance_of Qsim::RoutineSubject }
+        it 'returns a Routine subject' do
+          subject = subject_with_test(subject: 'bar')
+          expect(subject).to be_instance_of Qsim::RoutineSubject
+        end
       end
 
       context 'without subject' do
-        let(:definition) { Hash.new }
-        it { is_expected.to be_instance_of Qsim::ProgramSubject }
+        it 'returns a Program subject' do
+          subject = subject_with_test()
+          expect(subject).to be_instance_of Qsim::ProgramSubject
+        end
+      end
+
+      def subject_with_test(test = {})
+        Qsim::Subject.from_test(test, '')
       end
     end
   end
 
   describe '#compile_code' do
-    let(:request) { OpenStruct.new(extra: 'NOP', content: 'decrement: SUB AAAA, BBBB') }
-    let(:subject_instance) { qsim_subject.new('decrement', request) }
-    subject { subject_instance.compile_code('<<<>>>', '') }
-
     context 'with a subject' do
-      let(:qsim_subject) { Qsim::RoutineSubject }
+      it 'returns the expected code' do
+        code = compiled_code(Qsim::RoutineSubject, 'decrement')
+        expect(code).to eq <<~QSIM
+          JMP main
 
-      it { is_expected.to eq(
-                              <<~QSIM
-                                JMP main
+          NOP
+          decrement: SUB AAAA, BBBB
 
-                                NOP
-                                decrement: SUB AAAA, BBBB
+          main:
+          CALL decrement
+          <<<>>>
 
-                                main:
-                                CALL decrement
-                                <<<>>>
-
-                          QSIM
-                          )
-      }
+        QSIM
+      end
     end
 
     context 'without a subject' do
-      let(:qsim_subject) { Qsim::ProgramSubject }
+      it 'returns the expected code' do
+        code = compiled_code(Qsim::ProgramSubject)
+        expect(code).to eq <<~QSIM
+          JMP main
 
-      it { is_expected.to eq(
-                              <<~QSIM
-                                JMP main
+          NOP
+          
+          main:
+          MOV R0, R0
+          decrement: SUB AAAA, BBBB
+          <<<>>>
 
-                                NOP
+        QSIM
+      end
+    end
 
-                                main:
-                                MOV R0, R0
-                                decrement: SUB AAAA, BBBB
-                                <<<>>>
-
-                          QSIM
-                          )
-      }
+    def compiled_code(subject_class, subject = '')
+      request = double('request', extra: 'NOP', content: 'decrement: SUB AAAA, BBBB')
+      subject_class.new(subject, request).compile_code('<<<>>>', '')
     end
   end
 end
