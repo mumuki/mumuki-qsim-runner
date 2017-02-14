@@ -2,7 +2,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   include Mumukit::WithTempfile
   attr_reader :examples
 
-  isolated true
+  isolated
 
   def tempfile_extension
     '.qsim'
@@ -13,19 +13,21 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def compile_file_content(request)
-    test = parse_test request
-    @examples = to_examples test[:examples]
+    test = parse_test(request)
+    @examples = to_examples(test[:examples])
     @subject = test[:subject]
 
-    Qsim::Subject.from_test(test, request).compile_code(input_file_separator, initial_state_file)
+    Qsim::Subject
+      .from_test(test, request)
+      .compile_code(input_file_separator, initial_state_file)
   end
 
   def execute!(request)
-    result, _ = run_file! compile request
+    result, = run_file! compile request
     parse_json result
   end
 
-  def post_process_file(file, result, status)
+  def post_process_file(_file, result, status)
     output = parse_json result
 
     case status
@@ -41,8 +43,48 @@ class QsimTestHook < Mumukit::Templates::FileHook
   private
 
   def to_examples(examples)
-    defaults = {preconditions: {}}
-    examples.each_with_index.map { |example, index| defaults.merge(example).merge(id: index) }
+    examples.each_with_index.map do |example, index|
+      example[:preconditions] = classify(example.fetch(:preconditions, {}))
+      example.merge(id: index)
+    end
+  end
+
+  def classify(fields)
+    classified_fields = {}
+    fields.each do |key, value|
+      kind = category(key)
+      unless kind == :unknown
+        classified_fields.deep_merge!(kind => { key => value })
+      end
+    end
+    classified_fields
+  end
+
+  def category(key)
+    field = key.to_s
+    return :records if record?(field)
+    return :flags if flag?(field)
+    return :memory if memory?(field)
+    return :special_records if special_record?(field)
+    :unknown
+  end
+
+  def record?(key)
+    (0..7)
+      .map { |number| "R#{number}" }
+      .include?(key)
+  end
+
+  def flag?(key)
+    %w(N C V Z).include? key
+  end
+
+  def memory?(key)
+    /^[A-F0-9]{4}/.matches?(key)
+  end
+
+  def special_record?(key)
+    %w(SP PC IR).include? key
   end
 
   def framework
@@ -60,38 +102,38 @@ class QsimTestHook < Mumukit::Templates::FileHook
 
   def default_initial_state
     {
-        special_records: {
-            PC: '0000',
-            SP: 'FFEF',
-            IR: '0000'
-        },
-        flags: {
-            N: 0,
-            Z: 0,
-            V: 0,
-            C: 0
-        },
-        records: {
-            R0: '0000',
-            R1: '0000',
-            R2: '0000',
-            R3: '0000',
-            R4: '0000',
-            R5: '0000',
-            R6: '0000',
-            R7: '0000'
-        },
-        memory: {}
+      special_records: {
+        PC: '0000',
+        SP: 'FFEF',
+        IR: '0000'
+      },
+      flags: {
+        N: 0,
+        Z: 0,
+        V: 0,
+        C: 0
+      },
+      records: {
+        R0: '0000',
+        R1: '0000',
+        R2: '0000',
+        R3: '0000',
+        R4: '0000',
+        R5: '0000',
+        R6: '0000',
+        R7: '0000'
+      },
+      memory: {}
     }
   end
 
   def initial_state_file
     initial_states = @examples.map do |example|
       default_initial_state
-          .merge(id: example[:id])
-          .deep_merge(example[:preconditions])
+        .merge(id: example[:id])
+        .deep_merge(example[:preconditions])
     end
-    JSON.generate initial_states
+    JSON.generate(initial_states)
   end
 
   def q_architecture
