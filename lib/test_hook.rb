@@ -51,14 +51,22 @@ class QsimTestHook < Mumukit::Templates::FileHook
 
   def classify(fields)
     classified_fields = {}
-    fields.map do |key, value|
-      field = key.to_s
-      classified_fields.deep_merge!(records: { key => value }) if record?(field)
-      classified_fields.deep_merge!(flags: { key => value }) if flag?(field)
-      classified_fields.deep_merge!(memory: { key => value }) if memory?(field)
-      classified_fields.deep_merge!(special_records: { key => value }) if special_record?(field)
+    fields.each do |key, value|
+      kind = category(key)
+      unless kind == :unknown
+        classified_fields.deep_merge!(kind => { key => value })
+      end
     end
     classified_fields
+  end
+
+  def category(key)
+    field = key.to_s
+    return :records if record?(field)
+    return :flags if flag?(field)
+    return :memory if memory?(field)
+    return :special_records if special_record?(field)
+    :unknown
   end
 
   def record?(key)
