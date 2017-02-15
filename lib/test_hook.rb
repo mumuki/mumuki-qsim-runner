@@ -46,7 +46,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   def to_examples(examples)
     examples.each_with_index.map do |example, index|
       example[:preconditions] = classify(example.fetch(:preconditions, {}))
-      example.merge(id: index)
+      example.merge(id: index, output: @output)
     end
   end
 
@@ -98,8 +98,9 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def parse_test(request)
-    tests = load_tests(request)
-    define_output(tests)
+    load_tests(request).tap do |tests|
+      @output = define_output(tests)
+    end
   end
 
   def load_tests(request)
@@ -107,12 +108,14 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def define_output(parsed_tests)
-    defaults = { records: true, flags: false, special_records: false, memory: false }
-    parsed_tests.tap do |tests|
-      tests[:output] = defaults
-                         .merge(tests[:output] || {})
-                         .slice(*defaults.keys)
-      check_memory_range(tests[:output]) if tests[:output][:memory].is_a? Hash
+    output = { records: true }
+    output.merge!(parsed_tests[:output] || {})
+    check_memory_range(output) if output[:memory].is_a? Hash
+    keys = [:records, :flags, :special_records, :memory]
+    output.tap do |hash|
+      hash
+        .delete_if { |_, value| !value }
+        .slice!(*keys)
     end
   end
 

@@ -2,7 +2,7 @@ require_relative './data/fixture'
 
 describe QsimTestHook do
   describe '#set_output' do
-    let(:defaults) { { output: { records: true, flags: false, special_records: false, memory: false } } }
+    let(:defaults) { { records: true } }
 
     context 'when specified' do
       it 'removes unnecessary keys' do
@@ -10,10 +10,12 @@ describe QsimTestHook do
         expect(output).to eq defaults
       end
 
-      it 'keeps specified settings' do
-        settings = { records: false, flags: true, special_records: true, memory: true }
-        output = build_output(settings)
-        expect(output).to eq output: settings
+      it 'keeps specified settings and adds defaults' do
+        output = build_output(flags: true, special_records: true, memory: true)
+        expect(output).to eq records: true,
+                             flags: true,
+                             special_records: true,
+                             memory: true
       end
 
       context 'given a memory range' do
@@ -33,8 +35,7 @@ describe QsimTestHook do
 
         it 'remains unchanged' do
           output = build_output(memory: { from: '0', to: 'AAAA' })
-          memory = output[:output][:memory]
-          expect(memory).to eq from: '0', to: 'AAAA'
+          expect(output[:memory]).to eq from: '0', to: 'AAAA'
         end
       end
     end
@@ -46,8 +47,9 @@ describe QsimTestHook do
       end
     end
 
-    def build_output(settings = {})
-      QsimTestHook.new.send(:define_output, output: settings)
+    def build_output(config = {})
+      test = (config.empty? ? {} : { output: config })
+      QsimTestHook.new.send(:define_output, test)
     end
   end
 
@@ -55,24 +57,26 @@ describe QsimTestHook do
     it 'categorizes preconditions records and fields' do
       tests = [{ preconditions: { R1: '1010', N: '1', PC: '1', FFFF: '1' } }]
       example = to_examples(tests).first
-      expect(example).to eq(id: 0,
-                            preconditions: {
-                              records: { R1: '1010' },
-                              special_records: { PC: '1' },
-                              flags: { N: '1' },
-                              memory: { FFFF: '1' }
-                            })
+      expect(example).to include id: 0,
+                                 preconditions: {
+                                   records: { R1: '1010' },
+                                   special_records: { PC: '1' },
+                                   flags: { N: '1' },
+                                   memory: { FFFF: '1' }
+                                 }
     end
 
     it 'accepts tests without preconditions' do
       example = to_examples([{}]).first
-      expect(example).to eq(id: 0, preconditions: {})
+      expect(example).to include id: 0,
+                                 preconditions: {}
     end
 
     it 'ignores unmatched preconditions' do
       tests = [preconditions: { foo: '1', R8: '1', Z: '1' }]
       example = to_examples(tests).first
-      expect(example).to eq(id: 0, preconditions: { flags: { Z: '1' } })
+      expect(example).to include id: 0,
+                                 preconditions: { flags: { Z: '1' } }
     end
 
     def to_examples(tests)
@@ -145,7 +149,8 @@ describe QsimTestHook do
             },
             postconditions: {
               equal: { R2: 'B5F0' }
-            }
+            },
+            output: { records: true }
           }
         end
 
@@ -216,7 +221,7 @@ describe QsimTestHook do
 
     describe '#run!' do
       let(:file) { runner.compile(req(content, extra, test.to_yaml)) }
-      let(:test) { { subject: subject, examples: examples } }
+      let(:test) { { subject: subject, examples: examples, output: { memory: { from: '0000', to: '0100' } } } }
       let(:subject) { nil }
       let(:examples) { [{}] }
       let(:result) { runner.run!(file) }

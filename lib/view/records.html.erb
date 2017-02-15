@@ -1,28 +1,30 @@
 <style>
-  table.qsim-records {
+  table.qsim-fields {
     max-width: 10%;
     display: inline-block;
     border: none;
   }
 
-  td.qsim-record-name {
+  td.qsim-field-name {
     background-color: #ecf0f1;
     font-weight: bold;
     width: 1%;
     white-space: nowrap;
   }
 </style>
-
-<h5><%= I18n.t :records %></h5>
-<% @result[:records].each_slice(4) do |group| %>
-    <table class="table table-bordered qsim-records">
-      <tbody>
-      <% group.each do |name, value| %>
-          <tr>
-            <td class="qsim-record-name"><%= name %></td>
-            <td class="text-center"><%= value %></td>
-          </tr>
-      <% end %>
-      </tbody>
-    </table>
+<% @output[:key] %>
+<% @output.keys.each do |key| %>
+    <h5><%= I18n.t key %></h5>
+    <% @result[key].each_slice(4) do |group| %>
+        <table class="table table-bordered qsim-fields">
+          <tbody>
+          <% group.each do |name, value| %>
+              <tr>
+                <td class="qsim-field-name"><%= name %></td>
+                <td class="text-center"><%= value %></td>
+              </tr>
+          <% end %>
+          </tbody>
+        </table>
+    <% end %>
 <% end %>
