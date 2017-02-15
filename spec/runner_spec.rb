@@ -1,6 +1,56 @@
 require_relative './data/fixture'
 
 describe QsimTestHook do
+  describe '#set_output' do
+    let(:defaults) { { output: { records: true, flags: false, special_records: false, memory: false } } }
+
+    context 'when specified' do
+      it 'removes unnecessary keys' do
+        output = build_output(foo: 1)
+        expect(output).to eq defaults
+      end
+
+      it 'keeps specified settings' do
+        settings = { records: false, flags: true, special_records: true, memory: true }
+        output = build_output(settings)
+        expect(output).to eq output: settings
+      end
+
+      context 'given a memory range' do
+        context 'when out of range' do
+          it 'sets memory to false' do
+            output = build_output(memory: { from: '0', to: 'FFFF0' })
+            expect(output).to eq defaults
+          end
+        end
+
+        context "when 'from' is greater 'than' to" do
+          it 'sets memory to false' do
+            output = build_output(memory: { from: '2', to: '1' })
+            expect(output).to eq defaults
+          end
+        end
+
+        it 'remains unchanged' do
+          output = build_output(memory: { from: '0', to: 'AAAA' })
+          memory = output[:output][:memory]
+          expect(memory).to eq from: '0', to: 'AAAA'
+        end
+      end
+    end
+
+    context 'when it is not specified' do
+      it 'sets default values' do
+        output = build_output
+        expect(output).to eq defaults
+      end
+    end
+
+    def build_output(settings = {})
+      QsimTestHook.new.send(:define_output, output: settings)
+    end
+  end
+
   describe '#to_examples' do
     it 'categorizes preconditions records and fields' do
       tests = [{ preconditions: { R1: '1010', N: '1', PC: '1', FFFF: '1' } }]

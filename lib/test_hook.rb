@@ -1,5 +1,6 @@
 class QsimTestHook < Mumukit::Templates::FileHook
   include Mumukit::WithTempfile
+  using StringExtension
   attr_reader :examples
 
   isolated
@@ -97,7 +98,37 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def parse_test(request)
+    tests = load_tests(request)
+    define_output(tests)
+  end
+
+  def load_tests(request)
     YAML.load(request.test).deep_symbolize_keys
+  end
+
+  def define_output(parsed_tests)
+    defaults = { records: true, flags: false, special_records: false, memory: false }
+    parsed_tests.tap do |tests|
+      tests[:output] = defaults
+                         .merge(tests[:output] || {})
+                         .slice(*defaults.keys)
+      check_memory_range(tests[:output]) if tests[:output][:memory].is_a? Hash
+    end
+  end
+
+  def check_memory_range(config)
+    memory_settings = config[:memory]
+    from = memory_settings[:from].to_hex
+    to = memory_settings[:to].to_hex
+    config[:memory] = false unless to > from && in_memory_range?(from, to)
+  end
+
+  def in_memory_range?(*addresses)
+    addresses.all? { |address| memory_range.include?(address) }
+  end
+
+  def memory_range
+    0..0xFFFF
   end
 
   def default_initial_state
