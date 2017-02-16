@@ -21,7 +21,7 @@ module Qsim
     end
 
     def to_4_digits_hex(number)
-      number.to_s(16).rjust(4, '0')
+      number.to_s(16).rjust(4, '0').upcase
     end
 
     def memory_range(options)

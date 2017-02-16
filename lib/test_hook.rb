@@ -111,11 +111,10 @@ class QsimTestHook < Mumukit::Templates::FileHook
     output = { records: true }
     output.merge!(parsed_tests[:output] || {})
     check_memory_range(output) if output[:memory].is_a? Hash
-    keys = [:records, :flags, :special_records, :memory]
     output.tap do |hash|
       hash
         .delete_if { |_, value| !value }
-        .slice!(*keys)
+        .slice!(:records, :flags, :special_records, :memory)
     end
   end
 
