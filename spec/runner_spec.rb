@@ -57,30 +57,30 @@ describe QsimTestHook do
     it 'categorizes preconditions records and fields' do
       tests = [{ preconditions: { R1: '1010', N: '1', PC: '1', FFFF: '1' } }]
       example = to_examples(tests).first
-      expect(example).to include id: 0,
-                                 preconditions: {
-                                   records: { R1: '1010' },
-                                   special_records: { PC: '1' },
-                                   flags: { N: '1' },
-                                   memory: { FFFF: '1' }
-                                 }
+      expect(example).to eq id: 0,
+                            preconditions: {
+                              records: { R1: '1010' },
+                              special_records: { PC: '1' },
+                              flags: { N: '1' },
+                              memory: { FFFF: '1' }
+                            }
     end
 
     it 'accepts tests without preconditions' do
       example = to_examples([{}]).first
-      expect(example).to include id: 0,
-                                 preconditions: {}
+      expect(example).to eq id: 0,
+                            preconditions: {}
     end
 
     it 'ignores unmatched preconditions' do
       tests = [preconditions: { foo: '1', R8: '1', Z: '1' }]
       example = to_examples(tests).first
-      expect(example).to include id: 0,
-                                 preconditions: { flags: { Z: '1' } }
+      expect(example).to eq id: 0,
+                            preconditions: { flags: { Z: '1' } }
     end
 
     def to_examples(tests)
-      QsimTestHook.new.send(:to_examples, tests)
+      QsimTestHook.new.send(:to_examples, tests).map { |test| test.except(:output) }
     end
   end
 
