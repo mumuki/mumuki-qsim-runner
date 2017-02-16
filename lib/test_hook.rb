@@ -1,6 +1,5 @@
 class QsimTestHook < Mumukit::Templates::FileHook
   include Mumukit::WithTempfile
-  using StringExtension
   attr_reader :examples
 
   isolated

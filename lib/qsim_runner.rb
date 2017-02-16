@@ -10,7 +10,7 @@ Mumukit.configure do |config|
   config.structured = true
 end
 
-require_relative './extension/string_extension'
+require_relative './extensions/string_extension'
 require_relative './test_hook'
 require_relative './metadata_hook'
 require_relative './checker'

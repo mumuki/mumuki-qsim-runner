@@ -1,7 +1,5 @@
 module Qsim
   class HtmlRenderer
-    using StringExtension
-
     def render(result, output)
       @output = output
       @result = result
