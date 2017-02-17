@@ -15,8 +15,7 @@ describe 'Server' do
     context 'answers a valid hash when submission passes' do
       let(:response) { run_tests(program, tests, extra) }
 
-      it {
-        expect(response[:response_type]).to eq :structured }
+      it { expect(response[:response_type]).to eq :structured }
       it { expect(response[:test_results].size).to eq examples_count }
       it { expect(response[:status]).to eq :passed }
     end
