@@ -15,7 +15,7 @@
 <% @output[:key] %>
 <% @output.keys.each do |key| %>
     <h5><%= I18n.t key %></h5>
-    <% @result[key].each_slice(4) do |group| %>
+    <% @result[key].each_slice(@layout[key]) do |group| %>
         <table class="table table-bordered qsim-fields">
           <tbody>
           <% group.each do |name, value| %>
