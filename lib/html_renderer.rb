@@ -5,14 +5,13 @@ module Qsim
     def render(result, output)
       @output = output
       @result = {}
-      @layout = {}
       output.keys.each do |output_key|
-        @result[output_key] = range(output_key, output)
-                                .map { |key| [key_for(output_key, key), '0000'] }
-                                .to_h
-                                .merge(result[output_key])
-                                .sort
-        @layout[output_key] = columns_number(output_key.length)
+        fields = range(output_key, output)
+                   .map { |key| [key_for(output_key, key), '0000'] }
+                   .to_h
+                   .merge(result[output_key])
+                   .sort
+        @result[output_key] = fields
       end
       template_file.result binding
     end
@@ -21,10 +20,6 @@ module Qsim
 
     def template_file
       ERB.new File.read("#{__dir__}/view/records.html.erb")
-    end
-
-    def columns_number(size)
-      size < 7 ? size : 4
     end
 
     def to_memory(number)

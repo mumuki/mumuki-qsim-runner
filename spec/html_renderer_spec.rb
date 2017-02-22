@@ -11,13 +11,13 @@ describe Qsim::HtmlRenderer do
                          records: true,
                          special_records: true)
       expect(rendering).to include 'Memory', 'Flags', 'Special records', 'Records'
+      expect(rendering).not_to include '000C'
     end
 
     context 'when memory is specified' do
       it 'renders the range' do
-        rendering = render(memory: { from: '0007', to: '000B' })
-        expect(rendering).to include 'Memory', '0007', '0008', '0009', '000A', '000B'
-        expect(rendering).not_to include '0006', '000C'
+        rendering = render(memory: { from: '0007', to: '0012' })
+        expect(rendering).to include 'Memory', '0007', '0011'
       end
 
       it 'fills the unspecified records with zero' do

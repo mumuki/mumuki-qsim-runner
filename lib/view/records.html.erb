@@ -1,6 +1,5 @@
 <style>
   table.qsim-fields {
-    max-width: 10%;
     display: inline-block;
     border: none;
   }
@@ -8,22 +7,60 @@
   td.qsim-field-name {
     background-color: #ecf0f1;
     font-weight: bold;
-    width: 1%;
     white-space: nowrap;
   }
+
+  td {
+    text-align: center;
+    width: 60px;
+  }
 </style>
-<% @output[:key] %>
-<% @output.keys.each do |key| %>
-    <h5><%= I18n.t key %></h5>
-    <% @result[key].each_slice(@layout[key]) do |group| %>
+
+<% if @output.key?(:memory) %>
+    <h5><%= I18n.t :memory %></h5>
+    <table class="table table-bordered qsim-fields">
+      <tbody>
+      <% @result[:memory].each_slice(10) do |group| %>
+          <tr>
+            <% group.each.with_index do |record, index| %>
+                <% if index.zero? %>
+                    <td class="qsim-field-name"> <%= record[0] %> </td>
+                <% end %>
+                <td> <%= record[1] %> </td>
+            <% end %>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
+
+<% if @output.key?(:records) %>
+    <h5><%= I18n.t :records %></h5>
+    <table class="table table-bordered qsim-fields">
+      <tbody>
+      <% @result[:records].each_slice(4) do |group| %>
+          <tr>
+            <% group.each do |address, value| %>
+                <td class="qsim-field-name"> <%= address %> </td>
+                <td> <%= value %> </td>
+            <% end %>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
+
+<% [:flags, :special_records].each do |key| %>
+    <% if @result.key?(key) %>
+        <h5><%= I18n.t key %></h5>
         <table class="table table-bordered qsim-fields">
           <tbody>
-          <% group.each do |name, value| %>
-              <tr>
-                <td class="qsim-field-name"><%= name %></td>
-                <td class="text-center"><%= value %></td>
-              </tr>
-          <% end %>
+          <tr>
+            <% @result[key].each do |address, value| %>
+                <td class="qsim-field-name"><%= address %></td>
+                <td><%= value %></td>
+            <% end %>
+          </tr>
           </tbody>
         </table>
     <% end %>
