@@ -45,7 +45,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   def to_examples(examples)
     examples.each_with_index.map do |example, index|
       example[:preconditions] = classify(example.fetch(:preconditions, {}))
-      example.merge(id: index)
+      example.merge(id: index, output: @output)
     end
   end
 
@@ -97,7 +97,39 @@ class QsimTestHook < Mumukit::Templates::FileHook
   end
 
   def parse_test(request)
+    load_tests(request).tap do |tests|
+      @output = define_output(tests)
+    end
+  end
+
+  def load_tests(request)
     YAML.load(request.test).deep_symbolize_keys
+  end
+
+  def define_output(parsed_tests)
+    output = { records: true }
+    output.merge!(parsed_tests[:output] || {})
+    check_memory_range(output) if output[:memory].is_a? Hash
+    output.tap do |hash|
+      hash
+        .delete_if { |_, value| !value }
+        .slice!(:records, :flags, :special_records, :memory)
+    end
+  end
+
+  def check_memory_range(config)
+    memory_settings = config[:memory]
+    from = memory_settings[:from].to_hex
+    to = memory_settings[:to].to_hex
+    config[:memory] = false unless to > from && in_memory_range?(from, to)
+  end
+
+  def in_memory_range?(*addresses)
+    addresses.all? { |address| memory_range.include?(address) }
+  end
+
+  def memory_range
+    0..0xFFFF
   end
 
   def default_initial_state

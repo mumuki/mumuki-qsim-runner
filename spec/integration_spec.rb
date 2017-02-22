@@ -2,7 +2,7 @@ require 'active_support/all'
 require 'mumukit/bridge'
 
 describe 'Server' do
-  let(:bridge) { Mumukit::Bridge::Runner.new('http://localhost:4568') }
+  extend Fixture
 
   before(:all) do
     @pid = Process.spawn 'rackup -p 4568', err: '/dev/null'
@@ -11,33 +11,42 @@ describe 'Server' do
 
   after(:all) { Process.kill 'TERM', @pid }
 
-  let(:test) do
-    <<~EXAMPLE
-      examples:
-      - name: 'Result is OK'
-        preconditions:
-          R0: 'B5E1'
-          R1: '000F'
-        postconditions:
-          equal:
-            R2: 'B5F0'
+  shared_examples_for 'a successful submission' do |program, tests, extra = '', examples_count: 1|
+    context 'answers a valid hash when submission passes' do
+      let(:response) { run_tests(program, tests, extra) }
 
-      - name: 'Records are not modified'
-        preconditions:
-          R0: '0001'
-          R1: '000A'
-        postconditions:
-          equal:
-            R0: '0001'
-            R1: '000A'
-    EXAMPLE
+      it { expect(response[:response_type]).to eq :structured }
+      it { expect(response[:test_results].size).to eq examples_count }
+      it { expect(response[:status]).to eq :passed }
+    end
+
+    def run_tests(program, tests, extra)
+      bridge = Mumukit::Bridge::Runner.new('http://localhost:4568')
+      bridge.run_tests!(test: tests, extra: extra, content: program, expectations: [])
+    end
   end
 
-  it 'answers a valid hash when submission passes' do
-    response = bridge.run_tests!(test: test, extra: '', content: "ADD R2, R0\nADD R2, R1", expectations: [])
+  context 'given a single example' do
+    it_behaves_like 'a successful submission', q1_ok_program, q1_ok_program_examples
+  end
 
-    expect(response[:response_type]).to eq :structured
-    expect(response[:test_results].size).to eq 2
-    expect(response[:status]).to eq :passed
+  context 'given multiples examples' do
+    it_behaves_like 'a successful submission',
+                    r1_times_r2_program,
+                    r1_times_r2_program_examples,
+                    examples_count: 2
+  end
+
+  context 'given a subject' do
+    it_behaves_like 'a successful submission',
+                    times_three_program,
+                    times_three_program_examples
+  end
+
+  context 'given extra code' do
+    it_behaves_like 'a successful submission',
+                    times_two_program,
+                    times_two_program_examples,
+                    times_two_program_extra
   end
 end

@@ -1,5 +1,10 @@
 module Qsim
   class Checker < Mumukit::Metatest::Checker
+    def check(result, example)
+      @output_options = example[:output]
+      super
+    end
+
     def check_equal(result, records)
       records.each do |record, expected|
         actual = result[:records][record]
@@ -8,11 +13,11 @@ module Qsim
     end
 
     def render_success_output(result)
-      renderer.render result
+      renderer.render(result, @output_options)
     end
 
     def render_error_output(result, error)
-      "#{error}\n#{renderer.render result}"
+      "#{error}\n#{renderer.render(result, @output_options)}"
     end
 
     private

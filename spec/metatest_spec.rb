@@ -22,7 +22,8 @@ describe 'metatest' do
         [{
            id: 1,
            name: 'R3 is 0003',
-           postconditions: { equal: { R3: '0003' } }
+           postconditions: { equal: { R3: '0003' } },
+           output: { records: true }
          }]
       end
 
@@ -35,7 +36,8 @@ describe 'metatest' do
         [{
            id: 1,
            name: 'R3 is 0000',
-           postconditions: { equal: { R3: '0000' } }
+           postconditions: { equal: { R3: '0000' } },
+           output: { records: true }
          }]
       end
 
