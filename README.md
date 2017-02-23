@@ -57,7 +57,8 @@ If they are not specified program defaults with be set.
             R2: '0006'"
 ~~~
 
-Full examples can be found inside integration specs (`/spec/integration_spec.rb`)
+Full examples can be found in the [integration suite](https://github.com/mumuki/mumuki-qsim-runner/blob/master/spec/integration_spec.rb) or [programs folder](https://github.com/mumuki/mumuki-qsim-runner/tree/master/spec/data) 
+
 
 # Install the server
 
