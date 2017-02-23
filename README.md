@@ -16,7 +16,7 @@ Tests must be defined in a YAML-based string, following this structure.
 ~~~
 
 Each individual test consists of a name, preconditions, postconditions and output configuration.
-Both preconditions and output options are optional. If they are not specified, default values will be set.
+Both preconditions and output are optional. If they are not specified, default values will be set.
 
 * **Preconditions** are values we want our Qsim environment to start with.
 * **Postconditions** are expectations on post-execution record values.
