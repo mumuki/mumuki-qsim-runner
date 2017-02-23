@@ -23,7 +23,7 @@ Both preconditions and output are optional. If they are not specified, default v
 * **Output configurations** are used to specify which fields will be shown at the end of program. 
 
 In the example given below the program sets `R0 = AAAA` and `0001 = BBBB`, and expects
-that its final value is `FFFF`. Records, flags, special records and memory addresses can be set.
+that `R0` final value is `FFFF`. Records, flags, special records and memory addresses can be set.
 
 ~~~javascript
 test1 = {
@@ -55,7 +55,7 @@ range = { from: '0000', to: 'FFFF' }
 ~~~
 
 Now, let's modify the previous example in order to display only flags, 
-special records and memory from `'AAAA'` to `'BBBB'`
+special records and memory from `AAAA` to `BBBB`
 
 ~~~javascript
 test1_with_output = {
