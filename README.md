@@ -7,58 +7,102 @@
 
 It performs equality tests on one or many records after the execution of a given Qsim program.
 
-~~~ruby
-bridge = Mumukit::Bridge::Runner.new('http://localhost:4568')
-bridge.run_tests!(test: tests, extra: extra, content: program)
-~~~
-
-Extras are any type of additional code needed to run the exercise.
+## Tests
 
 Tests must be defined in a YAML-based string, following this structure.
+
 ~~~javascript
-{  examples: [test1, test2] }
+{ examples: [test1, test2] }
 ~~~
 
-Each individual test consists of a name, preconditions and postconditions.
+Each individual test consists of a name, preconditions, postconditions and output configuration.
+Both preconditions and output options are optional. If they are not specified, default values will be set.
 
-Preconditions are values we want our Qsim environment to start with, while postconditions
-are the expectations on post-execution record's values.
+* **Preconditions** are values we want our Qsim environment to start with.
+* **Postconditions** are expectations on post-execution record values.
+* **Output configurations** are used to specify which fields will be shown at the end of program. 
 
 In the example given below the program sets `R0 = AAAA` and `R1 = BBBB`, and expects
 that its final value is `FFFF`. Records, flags, special records and memory addresses can be set.
+
 ~~~javascript
 test1 = {
     name: 'R0 should remain unchanged',
     preconditions: {
         R0: 'AAAA',
-        R1: 'BBBB'
+        0001: 'BBBB'
     },
     postconditions: {
-        R0: 'FFFF'
+        equal: {
+            R0: 'FFFF'
+        }
     }
 }
 ~~~
-Keep in mind that preconditions are optional. 
-If they are not specified, program defaults with be set.
 
-##Full test example
-~~~ruby
-"examples:
-      - name: 'Multiplying by two doesn't change R1'        
-        postconditions:
-          equal:
-            R1: '0000'
-      - name: 'R2 is doubled'
-        preconditions:
-         R1: '0001'
-         R2: '0003'
-        postconditions:
-          equal:
-            R2: '0006'"
+Besides from it's default value, output can be modified by tweaking some keys. 
+Each key is tied to one category, and it determines whether the category is displayed or not. 
+
+* **memory**: (*`false` by default*) Can be either a `range` or `false`
+* **records**: (*`true` by default*) Can be either `true` or `false`
+* **flags**: (*`false` by default*) Can be either `true` or `false`
+* **special_records**: (*`false` by default*) Can be either `true` or `false`
+ 
+As populating the screen with all of the memory records wouldn't be wise, an address start and end must be declared.
+  
+~~~javascript
+range = { from: '0000', to: 'FFFF' }
 ~~~
 
-Full examples can be found in the [integration suite](https://github.com/mumuki/mumuki-qsim-runner/blob/master/spec/integration_spec.rb) or [programs folder](https://github.com/mumuki/mumuki-qsim-runner/tree/master/spec/data) 
+Now, let's modify the previous example in order to display only flags, 
+special records and memory from `'AAAA'` to `'BBBB'`
 
+~~~javascript
+test1_with_output = {
+    name: 'R0 should remain unchanged',
+    preconditions: {
+        R0: 'AAAA',
+        0001: 'BBBB'
+    },
+    postconditions: {
+        equal: {
+            R0: 'FFFF'
+        }
+    },
+    output: {
+        flags: true,
+        records: false,
+        special_records: true,
+        memory: {
+            from: 'AAAA',
+            to: 'BBBB'
+        }
+    }
+}
+~~~
+
+And finally in YAML format:
+
+~~~yaml
+examples:
+  - name: 'R0 should remain unchanged'        
+    postconditions:
+      equal:
+        R0: 'AAAA'
+        '0001': 'BBBB' 
+    postconditions:
+      equal:
+        R0: 'FFFF'
+    output:
+      flags: true
+      records: false
+      special_records: true
+      memory:
+        from: 'AAAA'
+        to: 'BBBB'
+~~~
+
+Additional full examples can be found in the [integration suite](https://github.com/mumuki/mumuki-qsim-runner/blob/master/spec/integration_spec.rb) or [programs folder](https://github.com/mumuki/mumuki-qsim-runner/tree/master/spec/data)
 
 # Install the server
 
