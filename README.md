@@ -39,7 +39,7 @@ test1 = {
 }
 ~~~
 Keep in mind that preconditions are optional. 
-If they are not specified program defaults with be set.
+If they are not specified, program defaults with be set.
 
 ##Full test example
 ~~~ruby
