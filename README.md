@@ -22,7 +22,7 @@ Both preconditions and output are optional. If they are not specified, default v
 * **Postconditions** are expectations on post-execution record values.
 * **Output configurations** are used to specify which fields will be shown at the end of program. 
 
-In the example given below the program sets `R0 = AAAA` and `R1 = BBBB`, and expects
+In the example given below the program sets `R0 = AAAA` and `0001 = BBBB`, and expects
 that its final value is `FFFF`. Records, flags, special records and memory addresses can be set.
 
 ~~~javascript
