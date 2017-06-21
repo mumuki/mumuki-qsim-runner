@@ -49,4 +49,10 @@ describe 'Server' do
                     times_two_program_examples,
                     times_two_program_extra
   end
+
+  context 'given both memory and records checks' do
+    it_behaves_like 'a successful submission',
+                    multiple_checks_program,
+                    multiple_checks_program_examples
+  end
 end
