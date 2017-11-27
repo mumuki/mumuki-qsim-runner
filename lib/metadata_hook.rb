@@ -11,7 +11,19 @@ class QsimMetadataHook < Mumukit::Hook
       },
       test_framework: {
         name: 'metatest',
-        test_extension: 'yml'
+        test_extension: 'yml',
+        template: <<qsim
+examples:
+- name: '{{ test_template_group_description }}'
+  preconditions:
+    records:
+      R0: '0001'
+      R1: '000A'
+  postconditions:
+    equal:
+      R0: '0001'
+      R1: '000A'
+qsim
       }
     }
   end
