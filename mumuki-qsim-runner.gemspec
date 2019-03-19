@@ -1,14 +1,17 @@
 # coding: utf-8
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require 'version'
+
 Gem::Specification.new do |spec|
   spec.name          = 'mumuki-qsim-runner'
-  spec.version       = '1.1.4'
+  spec.version       = QsimVersionHook::VERSION
   spec.authors       = ['Federico Aloi']
   spec.email         = ['fede@mumuki.org']
   spec.summary       = 'Qsim Runner for Mumuki'
-  spec.homepage      = 'http://github.com/mumuki/mumuki-qsim-server'
+  spec.homepage      = 'http://github.com/mumuki/mumuki-qsim-runner'
   spec.license       = 'MIT'
 
   spec.files         = Dir['lib/**/**']
@@ -24,5 +27,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.4'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'codeclimate-test-reporter'
-  spec.add_development_dependency 'mumukit-bridge', '~> 1.3'
+  spec.add_development_dependency 'mumukit-bridge', '~> 3.0'
 end
