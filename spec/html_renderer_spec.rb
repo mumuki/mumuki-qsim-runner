@@ -20,6 +20,16 @@ describe Qsim::HtmlRenderer do
         expect(rendering).to include 'Memory', '0007', '0017'
       end
 
+      it 'renders only the addresses within the specified range' do
+        rendering = render(memory: { from: '0009', to: '0020' })
+        expect(rendering).to_not include '0001'
+      end
+
+      it 'renders only the addresses within the specified range' do
+        rendering = render(memory: { from: '0009', to: '0020' })
+        expect(rendering).to include '00AA'
+      end
+
       it 'fills the unspecified records with zero' do
         rendering = render(memory: { from: '0001', to: '0002' })
         expect(rendering).to include '0000'
