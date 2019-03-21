@@ -20,7 +20,7 @@
     <h5><%= I18n.t :memory %></h5>
     <table class="table table-bordered qsim-fields">
       <tbody>
-      <% @result[:memory].each_slice(10) do |group| %>
+      <% @result[:memory].each_slice(16) do |group| %>
           <tr>
             <% group.each.with_index do |record, index| %>
                 <% if index.zero? %>
