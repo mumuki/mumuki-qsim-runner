@@ -9,7 +9,7 @@ module Qsim
         fields = range(output_key, output)
                    .map { |key| [key_for(output_key, key), '0000'] }
                    .to_h
-                   .merge(result[output_key])
+                   .tap { |it| it.merge!(result[output_key].slice(*it.keys)) }
                    .sort
         @result[output_key] = fields
       end
