@@ -162,25 +162,32 @@ describe QsimTestHook do
 
     context 'when program finishes' do
       context 'when it is successful' do
-        let(:result) { result_expecting(R3: '0007') }
+        let(:result) { result_expecting('R3 is 0007', q1_ok_program, R3: '0007') }
 
         it { expect(result[0]).to eq 'R3 is 0007' }
         it { expect(result[1]).to eq :passed }
       end
 
       context 'when it fails' do
-        let(:result) { result_expecting(R3: '0008') }
+        let(:result) { result_expecting('R3 is 0007', q1_ok_program, R3: '0008') }
 
         it { expect(result[0]).to eq 'R3 is 0007' }
         it { expect(result[1]).to eq :failed }
       end
+    end
 
-      def result_expecting(record)
-        examples = [{ name: 'R3 is 0007',
-                      operation: :run,
-                      postconditions: { equal: record } }]
-        run!(q1_ok_program, examples).first.first
-      end
+    context 'it accepts checking a memory position value' do
+      let(:result) { result_expecting('[0x1234] is 0010', save_to_memory_program, '1234': '0010') }
+
+      it { expect(result[0]).to eq '[0x1234] is 0010' }
+      it { expect(result[1]).to eq :passed }
+    end
+
+    def result_expecting(test_name, program, record)
+      examples = [{ name: test_name,
+                    operation: :run,
+                    postconditions: { equal: record } }]
+      run!(program, examples).first.first
     end
 
     def run!(program, examples = [{}])
