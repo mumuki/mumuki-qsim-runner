@@ -5,10 +5,10 @@ module Qsim
       super
     end
 
-    def check_equal(result, records)
-      records.each do |record, expected|
-        actual = result[:records][record]
-        fail I18n.t(:check_equal_failure, record: record, expected: expected, actual: actual) unless actual == expected
+    def check_equal(result, state)
+      state.each do |target, expected|
+        actual = target_value result, target
+        fail I18n.t(:check_equal_failure, record: target, expected: expected, actual: actual) unless actual == expected
       end
     end
 
@@ -21,6 +21,17 @@ module Qsim
     end
 
     private
+
+    def target_value(result, target)
+      case target
+      when /R\d/
+        result[:records][target]
+      when /[0-9A-F]{4}/
+        result[:memory][target]
+      else
+        error I18n.t :unknown_target, target: target
+      end
+    end
 
     def renderer
       @renderer ||= Qsim::HtmlRenderer.new
