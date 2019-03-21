@@ -3,6 +3,7 @@ require_relative 'r1_plus_r2_program'
 require_relative 'times_two_program'
 require_relative 'times_three_program'
 require_relative 'r1_times_r2'
+require_relative 'save_to_memory_program'
 
 module Fixture
   def syntax_error_program
