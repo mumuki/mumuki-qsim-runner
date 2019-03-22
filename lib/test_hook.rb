@@ -45,7 +45,7 @@ class QsimTestHook < Mumukit::Templates::FileHook
   def to_examples(examples)
     examples.each_with_index.map do |example, index|
       example[:preconditions] = classify(example.fetch(:preconditions, {}))
-      example.merge(id: index, output: @output)
+      { id: index, output: @output }.deep_merge example
     end
   end
 
