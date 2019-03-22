@@ -16,8 +16,18 @@ describe Qsim::HtmlRenderer do
 
     context 'when memory is specified' do
       it 'renders the range' do
-        rendering = render(memory: { from: '0007', to: '0012' })
-        expect(rendering).to include 'Memory', '0007', '0011'
+        rendering = render(memory: { from: '0007', to: '0020' })
+        expect(rendering).to include 'Memory', '0007', '0017'
+      end
+
+      it 'renders only the addresses within the specified range' do
+        rendering = render(memory: { from: '0009', to: '0020' })
+        expect(rendering).to_not include '0001'
+      end
+
+      it 'renders only the addresses within the specified range' do
+        rendering = render(memory: { from: '0009', to: '0020' })
+        expect(rendering).to include '00AA'
       end
 
       it 'fills the unspecified records with zero' do
@@ -35,7 +45,7 @@ describe Qsim::HtmlRenderer do
 
     def render(output = { records: true })
       result = { records: { R0: 'CAFE', R7: 'BABE' },
-                 memory: { '0007': '0001', '000A' => '00AA' },
+                 memory: { '0007' => '0001', '000A' => '00AA' },
                  flags: { N: 0, Z: 0, V: 0, C: 1 },
                  special_records: { SP: 'FFEF' } }
       result.deep_symbolize_keys!
