@@ -42,6 +42,29 @@ describe QsimTestHook do
           expect(output[:memory]).to eq from: '0', to: 'AAAA'
         end
       end
+
+
+      context 'allows setting output settings for multiple examples' do
+        let(:examples) { build_examples(group_settings_example) }
+
+        it { expect(examples[0][:output][:special_records]).to eq true }
+        it { expect(examples[1][:output][:special_records]).to eq true }
+      end
+
+
+      context 'allows setting output settings for single example' do
+        let(:examples) { build_examples(individual_settings_example) }
+
+        it { expect(examples[0][:output][:special_records]).to eq nil }
+        it { expect(examples[1][:output][:special_records]).to eq true }
+      end
+
+      context 'overrides group output settings for individual example ones' do
+        let(:examples) { build_examples(settings_override_example) }
+
+        it { expect(examples[0][:output][:special_records]).to eq false }
+        it { expect(examples[1][:output][:special_records]).to eq true }
+      end
     end
 
     context 'when it is not specified' do
@@ -54,6 +77,11 @@ describe QsimTestHook do
     def build_output(config = {})
       test = (config.empty? ? {} : { output: config })
       runner.send(:define_output, test)
+    end
+
+    def build_examples(tests)
+      tests = runner.send :parse_test, struct(test: tests)
+      runner.send :to_examples, tests[:examples]
     end
   end
 
