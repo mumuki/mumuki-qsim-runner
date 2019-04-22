@@ -4,3 +4,5 @@ hs_*.log
 bin/
 Gemfile.lock
 coverage/
+
+worker/QSim.jar
